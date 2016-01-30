@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-my $version = '0.3.3-DEV';
+my $version = '0.3.4';
 my $author_info = <<EOF;
 ##########################################
 #   Author: Rob Reed
 #  Created: 2013-06-26
-# Modified: 2015-03-29 17:00 PST
+# Modified: 2016-01-30 12:05 PST
 #
 #  Version: $version
 # https://github.com/ljunkie/plexWatch
@@ -1365,7 +1365,7 @@ sub GetSessions() {
     my ($userAgent, $request, $response);
     $userAgent = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                        });
 
     $userAgent->timeout(20);
@@ -1435,7 +1435,7 @@ sub PMSToken() {
     my ($userAgent, $request, $response);
     $userAgent = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                        });
     $userAgent->timeout(10);
     $userAgent->agent($appname);
@@ -2319,7 +2319,7 @@ sub NotifyProwl() {
     my ($userAgent, $request, $response, $requestURL);
     $userAgent = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                        });
     $userAgent->timeout(20);
     $userAgent->agent($appname);
@@ -2369,7 +2369,7 @@ sub NotifyPushOver() {
     my %po = %{$notify->{pushover}};
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
     $po{'message'} = $alert;
@@ -2569,7 +2569,7 @@ sub NotifyPushalot() {
     my %pa = %{$notify->{pushalot}};
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
     $pa{'message'} = $alert;
@@ -2633,7 +2633,7 @@ sub NotifyPushbullet() {
     my %po = %{$notify->{pushbullet}};
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
     $po{'message'} = $alert;
@@ -3387,7 +3387,7 @@ sub GetSectionsIDs() {
 
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
 
@@ -3423,7 +3423,7 @@ sub GetItemMetadata() {
 
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
 
@@ -3468,7 +3468,7 @@ sub GetRecentlyAdded() {
 
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
 
@@ -3807,7 +3807,7 @@ sub myPlexToken() {
     }
     my $ua = LWP::UserAgent->new(  ssl_opts => {
         verify_hostname => 0,
-        SSL_verify_mode => "SSL_VERIFY_NONE",
+        SSL_verify_mode => SSL_VERIFY_NONE,
                                    });
     $ua->timeout(20);
     $ua->agent($appname);
