@@ -14,6 +14,7 @@ EOF
 
 use strict;
 use LWP::UserAgent;
+use LWP::Simple;
 use XML::Simple;
 use DBI;
 use Time::Duration;
@@ -131,6 +132,9 @@ my $format_options = {
     'state' => 'playing, paused or buffering [ or stopped ] (useful on --watching)',
     'percent_complete' => 'Percent of video watched -- user could have only watched 5 minutes, but skipped to end = 100%',
     'ip_address' => 'Client IP Address',
+    'ip_address_geo' => 'Client IP Address full geolocation info (city, region, country, latitude + longitude)',
+    'ip_address_geo_city' => 'Client IP Address geolocation info for city',
+    'ip_address_geo_region' => 'Client IP Address geolocation info for region'
 };
 
 if (!-d $data_dir) {
@@ -553,6 +557,7 @@ if ($options{'notify'}) {
                 my $paused = &getSecPaused($k);
                 my $info = &info_from_xml($started->{$k}->{'xml'},'stop',$start_epoch,$stop_epoch,$paused);
                 $info->{'ip_address'} = $started->{$k}->{ip_address};
+
                 &SetStopped($started->{$k}->{id},$stop_epoch);  # will mark as unnotified
 
                 $info->{'decoded'} = 1; ## XML - already decoded
@@ -593,13 +598,13 @@ if ($options{'notify'}) {
         ## ignore content that has already been notified
         ## However, UPDATE the XML in the DB
 
-
         if ($started->{$db_key}) {
             $info->{'ip_address'} = $started->{$db_key}->{ip_address};
             ## try and locate IP address on each run ( if empty )
             if (!$info->{'ip_address'}) {
                 $info->{'ip_address'} = &LocateIP($info) if ref $info;
             }
+
             my $state_change = &ProcessUpdate($live->{$k},$db_key,$info->{'ip_address'}); ## update XML
 
             ## notify on pause/resume -- only providers with push_resume or push_pause will be notified
@@ -714,6 +719,8 @@ sub formatAlert() {
     }
 
     $info->{'ip_address'} = '' if !$info->{'ip_address'};
+    $info->{'ip_address_geo_city'} = '' if !$info->{'ip_address_geo_city'};
+    $info->{'ip_address_geo_region'} = '' if !$info->{'ip_address_geo_region'};
 
     my $type = $info->{'ntype'};
     my @types = qw(start watched watching stop paused resumed);
@@ -956,6 +963,13 @@ sub Notify() {
         $type = "paused" if $info->{'state'} =~ /pause/i;
         $info->{'ntype'} = $type;
         &DebugLog($dinfo . ': '."state:$info->{'state'}, ntype:$type ");
+    }
+
+    ## fetch geolocation data for client
+    if (defined($info->{'ip_address'})) {
+        $info->{'ip_address_geo'} = &getIPGeolocationInfo($info->{'ip_address'});
+        $info->{'ip_address_geo_city'} = $info->{'ip_address_geo'}->{'city'};
+        $info->{'ip_address_geo_region'} = $info->{'ip_address_geo'}->{'region'};
     }
 
     my ($alert) = &formatAlert($info);
@@ -1220,6 +1234,18 @@ sub LocateIP() {
                 }
             }
         }
+    }
+}
+
+sub getIPGeolocationInfo() {
+    my $ipaddr = shift;
+
+    return if ($ipaddr =~ /^192.168/);
+
+    my $ipinfo = get("http://ipinfo.io/$ipaddr/geo");
+
+    if (defined($ipinfo)) {
+        return decode_json($ipinfo);
     }
 }
 
