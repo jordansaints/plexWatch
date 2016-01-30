@@ -557,7 +557,6 @@ if ($options{'notify'}) {
                 my $paused = &getSecPaused($k);
                 my $info = &info_from_xml($started->{$k}->{'xml'},'stop',$start_epoch,$stop_epoch,$paused);
                 $info->{'ip_address'} = $started->{$k}->{ip_address};
-
                 &SetStopped($started->{$k}->{id},$stop_epoch);  # will mark as unnotified
 
                 $info->{'decoded'} = 1; ## XML - already decoded
@@ -598,13 +597,13 @@ if ($options{'notify'}) {
         ## ignore content that has already been notified
         ## However, UPDATE the XML in the DB
 
+
         if ($started->{$db_key}) {
             $info->{'ip_address'} = $started->{$db_key}->{ip_address};
             ## try and locate IP address on each run ( if empty )
             if (!$info->{'ip_address'}) {
                 $info->{'ip_address'} = &LocateIP($info) if ref $info;
             }
-
             my $state_change = &ProcessUpdate($live->{$k},$db_key,$info->{'ip_address'}); ## update XML
 
             ## notify on pause/resume -- only providers with push_resume or push_pause will be notified
